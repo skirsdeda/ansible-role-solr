@@ -25,3 +25,4 @@
 
 - name: Set hostname
   lineinfile: dest=/etc/default/{{ solr_service_name }}.in.sh regexp=^SOLR_HOST= line='SOLR_HOST="{{ solr_host }}"'
+  notify: restart solr
