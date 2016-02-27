@@ -23,6 +23,9 @@
   command: "{{ solr_workspace }}/{{ solr_filename }}/bin/install_solr_service.sh {{ solr_workspace }}/{{ solr_filename }}.tgz -p {{ solr_port }} -s {{ solr_service_name }} -u {{ solr_user }}"
   when: not solr_file.stat.exists 
 
+- include: create_core.yml
+  with_items: '{{ solr_cores }}'
+
 - name: Set hostname
   lineinfile: dest=/etc/default/{{ solr_service_name }}.in.sh regexp=^SOLR_HOST= line='SOLR_HOST="{{ solr_host }}"'
   notify: restart solr

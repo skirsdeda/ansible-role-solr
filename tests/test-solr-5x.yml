@@ -5,6 +5,9 @@
     solr_version: "5.4.1"
     java_packages:
       - java-1.8.0-openjdk
+    solr_cores:
+      - collection0
+      - collection1
   roles:
     - ansible-role-java
     - ansible-role-solr

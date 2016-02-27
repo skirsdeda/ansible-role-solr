@@ -1,0 +1,23 @@
+---
+- name: Check if core already exists.
+  stat: "path={{ solr_home }}/data/{{ item }}"
+  register: solr_core
+
+- name: Create dir for new core.
+  file:
+    path: "{{ solr_home }}/data/{{ item }}"
+    state: directory
+  when: not solr_core.stat.exists
+
+- name: Copy core configuration from example.
+  shell: "cp -r {{ solr_install_path }}/example/example-DIH/solr/solr/* {{ solr_home }}/data/{{ item }}"
+  when: not solr_core.stat.exists
+
+- name: Ensure core files are owned by the solr_user.
+  file:
+    path: "{{ solr_home }}/data/{{ item }}"
+    owner: "{{ solr_user }}"
+    group: "{{ solr_user }}"
+    recurse: yes 
+  when: not solr_core.stat.exists
+  notify: restart solr
