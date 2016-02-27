@@ -2,21 +2,13 @@
 dependencies: []
 
 galaxy_info:
-  author: geerlingguy
-  description: Apache Solr for Linux.
-  company: "Midwestern Mac, LLC"
+  author: skirsdeda
+  description: Apache Solr 5.4 for EL.
   license: "license (BSD, MIT)"
   min_ansible_version: 1.4
   platforms:
   - name: EL
     versions:
-    - 6
     - 7
-  - name: Debian
-    versions:
-    - all
-  - name: Ubuntu
-    versions:
-    - all
   categories:
     - development

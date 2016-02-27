@@ -1,16 +1,8 @@
 ---
-- include: user.yml
-  when: solr_create_user
-
-- name: Set solr_filename for Solr 4.x.
+- name: Set solr_filename for Solr >=5.x.
   set_fact:
     "solr_filename=solr-{{ solr_version }}"
-  when: "solr_version.split('.')[0] == '4'"
-
-- name: Set solr_filename for Solr 3.x.
-  set_fact:
-    solr_filename: "apache-solr-{{ solr_version }}"
-  when: "solr_version.split('.')[0] == '3'"
+  when: "solr_version.split('.')[0] == '5'"
 
 - name: Download Solr.
   get_url:
@@ -21,23 +13,15 @@
 - name: Expand Solr.
   command: >
     tar -C {{ solr_workspace }} -xvzf {{ solr_workspace }}/{{ solr_filename }}.tgz
-    creates={{ solr_workspace }}/{{ solr_filename }}/dist/{{ solr_filename }}.war
+    creates={{ solr_workspace }}/{{ solr_filename }}/bin/solr
 
 - name: Check if Solr is already installed.
-  stat: "path={{ solr_install_path }}/dist/{{ solr_filename }}.war"
-  register: solr_war_file
+  stat: "path={{ solr_install_path }}/bin/solr"
+  register: solr_file
 
-- name: Copy Solr into place.
-  command: "cp -r {{ solr_workspace }}/{{ solr_filename }} {{ solr_install_path }}"
-  when: not solr_war_file.stat.exists
+- name: Run install_solr_service.sh 
+  command: "{{ solr_workspace }}/{{ solr_filename }}/bin/install_solr_service.sh {{ solr_workspace }}/{{ solr_filename }}.tgz -p {{ solr_port }} -s {{ solr_service_name }} -u {{ solr_user }}"
+  when: not solr_file.stat.exists 
 
-- name: Ensure Solr install files are owned by the solr_user.
-  file:
-    path: "{{ solr_install_path }}"
-    owner: "{{ solr_user }}"
-    group: "{{ solr_user }}"
-    recurse: yes
-  when: not solr_war_file.stat.exists
-
-- include: solr-home.yml
-- include: init-script.yml
+- name: Set hostname
+  lineinfile: dest=/etc/default/{{ solr_service_name }}.in.sh regexp=^SOLR_HOST= line='SOLR_HOST="{{ solr_host }}"'
